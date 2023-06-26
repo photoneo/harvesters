@@ -334,6 +334,13 @@ uint8_formats = [
     #
     'Confidence1',
     'Confidence8',
+    #
+    'Data8'
+]
+
+int8_formats = [
+    #
+    'Data8s'
 ]
 
 uint16_formats = [
@@ -409,10 +416,34 @@ uint16_formats = [
     'Coord3D_AC12p_Planar',
     #
     'Confidence16',
+    #
+    'Data16'
+]
+
+int16_formats = [
+    #
+    'Data16s'
 ]
 
 uint32_formats = [
     'Mono32',
+    #
+    'Data32'
+]
+
+int32_formats = [
+    #
+    'Data32s'
+]
+
+uint64_formats = [
+    #
+    'Data64'
+]
+
+int64_formats = [
+    #
+    'Data64s'
 ]
 
 float32_formats = [
@@ -428,6 +459,13 @@ float32_formats = [
     'Coord3D_AC32f_Planar',
     #
     'Confidence32f',
+    #
+    'Data32f'
+]
+
+float64_formats = [
+    #
+    'Data64f'
 ]
 
 component_8bit_formats = [
@@ -564,6 +602,11 @@ class _DataSize(IntEnum):
     UINT16 = 3
     UINT32 = 4
     FLOAT32 = 5
+    INT16 = 6
+    INT32 = 7
+    INT64 = 8
+    UINT64 = 9
+    FLOAT64 = 10
 
 
 class _Location(IntEnum):
@@ -617,10 +660,12 @@ class _Alignment:
     def _get_size(index: IntEnum):
         if (index == _DataSize.INT8) or (index == _DataSize.UINT8):
             return 8
-        elif index == _DataSize.UINT16:
+        elif (index == _DataSize.INT16) or (index == _DataSize.UINT16):
             return 16
-        elif (index == _DataSize.UINT32) or (index == _DataSize.FLOAT32):
+        elif (index == _DataSize.INT32) or (index == _DataSize.UINT32) or (index == _DataSize.FLOAT32):
             return 32
+        elif (index == _DataSize.INT64) or (index == _DataSize.UINT64) or (index == _DataSize.FLOAT64):
+            return 64
         else:
             raise ValueError
 
@@ -742,6 +787,23 @@ class _UnpackedInt8(_Unpacked):
         return array.view(numpy.int8)
 
 
+class _UnpackedInt16(_Unpacked):
+    def __init__(
+            self, symbolic: str = None, nr_components=None,
+            unit_depth_in_bit: int = None, location: _Location = None):
+        #
+        super().__init__(
+            alignment=_Alignment(unpacked=_DataSize.INT16),
+            symbolic=symbolic,
+            nr_components=nr_components,
+            unit_depth_in_bit=unit_depth_in_bit,
+            location=location
+        )
+
+    def expand(self, array: numpy.ndarray) -> numpy.ndarray:
+        return array.view(numpy.int16)
+
+
 class _UnpackedUint16(_Unpacked):
     def __init__(
             self, symbolic: str = None, nr_components=None,
@@ -759,6 +821,74 @@ class _UnpackedUint16(_Unpacked):
         return array.view(numpy.uint16)
 
 
+class _UnpackedInt32(_Unpacked):
+    def __init__(
+            self, symbolic: str = None, nr_components=None,
+            unit_depth_in_bit: int = None, location: _Location = None):
+        #
+        super().__init__(
+            alignment=_Alignment(unpacked=_DataSize.INT32),
+            symbolic=symbolic,
+            nr_components=nr_components,
+            unit_depth_in_bit=unit_depth_in_bit,
+            location=location
+        )
+
+    def expand(self, array: numpy.ndarray) -> numpy.ndarray:
+        return array.view(numpy.int32)
+    
+
+class _UnpackedUint32(_Unpacked):
+    def __init__(
+            self, symbolic: str = None, nr_components=None,
+            unit_depth_in_bit: int = None, location: _Location = None):
+        #
+        super().__init__(
+            alignment=_Alignment(unpacked=_DataSize.UINT32),
+            symbolic=symbolic,
+            nr_components=nr_components,
+            unit_depth_in_bit=unit_depth_in_bit,
+            location=location
+        )
+
+    def expand(self, array: numpy.ndarray) -> numpy.ndarray:
+        return array.view(numpy.uint32)    
+
+
+class _UnpackedInt64(_Unpacked):
+    def __init__(
+            self, symbolic: str = None, nr_components=None,
+            unit_depth_in_bit: int = None, location: _Location = None):
+        #
+        super().__init__(
+            alignment=_Alignment(unpacked=_DataSize.INT64),
+            symbolic=symbolic,
+            nr_components=nr_components,
+            unit_depth_in_bit=unit_depth_in_bit,
+            location=location
+        )
+
+    def expand(self, array: numpy.ndarray) -> numpy.ndarray:
+        return array.view(numpy.int64)
+    
+
+class _UnpackedUint64(_Unpacked):
+    def __init__(
+            self, symbolic: str = None, nr_components=None,
+            unit_depth_in_bit: int = None, location: _Location = None):
+        #
+        super().__init__(
+            alignment=_Alignment(unpacked=_DataSize.UINT64),
+            symbolic=symbolic,
+            nr_components=nr_components,
+            unit_depth_in_bit=unit_depth_in_bit,
+            location=location
+        )
+
+    def expand(self, array: numpy.ndarray) -> numpy.ndarray:
+        return array.view(numpy.uint64)  
+
+
 class _UnpackedFloat32(_Unpacked):
     def __init__(
             self, symbolic: str = None, nr_components=None,
@@ -774,6 +904,23 @@ class _UnpackedFloat32(_Unpacked):
 
     def expand(self, array: numpy.ndarray) -> numpy.ndarray:
         return array.view(numpy.float32)
+    
+
+class _UnpackedFloat64(_Unpacked):
+    def __init__(
+            self, symbolic: str = None, nr_components=None,
+            unit_depth_in_bit: int = None, location: _Location = None):
+        #
+        super().__init__(
+            alignment=_Alignment(unpacked=_DataSize.FLOAT64),
+            symbolic=symbolic,
+            nr_components=nr_components,
+            unit_depth_in_bit=unit_depth_in_bit,
+            location=location
+        )
+
+    def expand(self, array: numpy.ndarray) -> numpy.ndarray:
+        return array.view(numpy.float64)
 
 
 # ----
@@ -3036,6 +3183,122 @@ class BayerRG12p(_Bayer_12p):
         super().__init__(symbolic=self.__class__.__name__)
 
 
+# ----
+
+
+class Data8(_UnpackedUint8):
+    def __init__(self):
+        #
+        super().__init__(
+            symbolic=self.__class__.__name__,
+            nr_components=1.,
+            unit_depth_in_bit=8,
+            location=_Location.MONO
+        )
+
+
+class Data8s(_UnpackedInt8):
+    def __init__(self):
+        #
+        super().__init__(
+            symbolic=self.__class__.__name__,
+            nr_components=1.,
+            unit_depth_in_bit=8,
+            location=_Location.MONO
+        )
+
+
+class Data16(_UnpackedUint16):
+    def __init__(self):
+        #
+        super().__init__(
+            symbolic=self.__class__.__name__,
+            nr_components=1.,
+            unit_depth_in_bit=16,
+            location=_Location.MONO
+        )
+
+
+class Data16s(_UnpackedInt16):
+    def __init__(self):
+        #
+        super().__init__(
+            symbolic=self.__class__.__name__,
+            nr_components=1.,
+            unit_depth_in_bit=16,
+            location=_Location.MONO
+        )
+
+
+class Data32(_UnpackedUint32):
+    def __init__(self):
+        #
+        super().__init__(
+            symbolic=self.__class__.__name__,
+            nr_components=1.,
+            unit_depth_in_bit=32,
+            location=_Location.MONO
+        )
+
+
+class Data32s(_UnpackedInt32):
+    def __init__(self):
+        #
+        super().__init__(
+            symbolic=self.__class__.__name__,
+            nr_components=1.,
+            unit_depth_in_bit=32,
+            location=_Location.MONO
+        )
+
+
+class Data32f(_UnpackedFloat32):
+    def __init__(self):
+        #
+        super().__init__(
+            symbolic=self.__class__.__name__,
+            nr_components=1.,
+            unit_depth_in_bit=32,
+            location=_Location.MONO
+        )
+
+
+class Data64(_UnpackedUint64):
+    def __init__(self):
+        #
+        super().__init__(
+            symbolic=self.__class__.__name__,
+            nr_components=1.,
+            unit_depth_in_bit=64,
+            location=_Location.MONO
+        )
+
+
+class Data64s(_UnpackedInt64):
+    def __init__(self):
+        #
+        super().__init__(
+            symbolic=self.__class__.__name__,
+            nr_components=1.,
+            unit_depth_in_bit=64,
+            location=_Location.MONO
+        )
+
+
+class Data64f(_UnpackedFloat64):
+    def __init__(self):
+        #
+        super().__init__(
+            symbolic=self.__class__.__name__,
+            nr_components=1.,
+            unit_depth_in_bit=64,
+            location=_Location.MONO
+        )
+
+
+# ----
+
+
 class Dictionary:
     _pixel_formats = [
         Mono8(),
@@ -3213,6 +3476,16 @@ class Dictionary:
         RGB12p(),
         BGR10p(),
         BGR12p(),
+        Data8(),
+        Data8s(),
+        Data16(),
+        Data16s(),
+        Data32(),
+        Data32s(),
+        Data32f(),
+        Data64(),
+        Data64s(),
+        Data64f()
     ]
 
     def __init__(self):
